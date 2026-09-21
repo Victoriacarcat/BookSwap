@@ -13,7 +13,9 @@ data class Libro(
     val lng: Double,
     val idDueño: String,
     val disponible: Boolean = true,
-    val distanciaTexto: String = "0.5 km"
+    val distanciaTexto: String = "0.5 km",
+    val descripcion: String = "",
+    val notaPublicante: String = ""
 )
 
 enum class EstadoLibro {

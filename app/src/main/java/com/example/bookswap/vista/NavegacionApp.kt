@@ -69,7 +69,8 @@ fun NavegacionApp(navController: NavHostController = rememberNavController()) {
                 val idLibro = backStackEntry.arguments?.getString("idLibro") ?: return@composable
                 DetalleVista(
                     idLibro = idLibro,
-                    alProponerIntercambio = { }
+                    alProponerIntercambio = { },
+                    alVolver = { navController.popBackStack() }
                 )
             }
         }

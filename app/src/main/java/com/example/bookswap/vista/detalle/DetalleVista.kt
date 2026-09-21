@@ -4,8 +4,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun DetalleVista(
     idLibro: String,
     alProponerIntercambio: () -> Unit,
+    alVolver: () -> Unit = {},
     vistaModelo: DetalleVistaModelo = viewModel(),
 ) {
     val libro by vistaModelo.libro.collectAsState()
@@ -49,6 +54,12 @@ fun DetalleVista(
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
+        IconButton(onClick = alVolver) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         Image(
             painter = painterResource(id = libroActual.imagenResId),
             contentDescription = libroActual.titulo,
@@ -67,6 +78,20 @@ fun DetalleVista(
 
         Text(text = "Género: ${libroActual.genero}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Estado: ${libroActual.estado.name}", style = MaterialTheme.typography.bodyMedium)
+
+        if (libroActual.descripcion.isNotBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Descripción", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = libroActual.descripcion, style = MaterialTheme.typography.bodyMedium)
+        }
+
+        if (libroActual.notaPublicante.isNotBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Nota de quien lo publica", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = libroActual.notaPublicante, style = MaterialTheme.typography.bodyMedium)
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
