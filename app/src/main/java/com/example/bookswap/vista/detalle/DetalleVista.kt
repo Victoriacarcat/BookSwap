@@ -28,7 +28,7 @@ fun DetalleVista(
     idLibro: String,
     alProponerIntercambio: () -> Unit,
     alVolver: () -> Unit = {},
-    vistaModelo: DetalleVistaModelo = viewModel(),
+    vistaModelo: DetalleVistaModelo = viewModel(factory = DetalleVistaModelo.Fabrica)
 ) {
     val libro by vistaModelo.libro.collectAsState()
 

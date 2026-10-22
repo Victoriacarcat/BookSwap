@@ -17,8 +17,9 @@ import com.example.bookswap.vista.componentes.SeccionHorizontalLibros
 import com.example.bookswap.vista.componentes.SeccionVecinos
 
 @Composable
+
 fun HomeVista(
-    vistaModelo: HomeVistaModelo = viewModel(),
+    vistaModelo: HomeVistaModelo = viewModel(factory = HomeVistaModelo.Fabrica),
     alTocarLibro: (Libro) -> Unit,
 ) {
     val libros by vistaModelo.libros.collectAsState()
