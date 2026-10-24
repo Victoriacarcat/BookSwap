@@ -14,12 +14,14 @@ import androidx.compose.runtime.Composable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BarraSuperior(alTocarBusqueda: () -> Unit = {}) {
+fun BarraSuperior(alTocarBusqueda: (() -> Unit)? = null) {
     TopAppBar(
         title = { Text("BookSwap", style = MaterialTheme.typography.titleLarge) },
         actions = {
-            IconButton(onClick = alTocarBusqueda) {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "Buscar")
+            if (alTocarBusqueda != null) {
+                IconButton(onClick = alTocarBusqueda) {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Buscar")
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

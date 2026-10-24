@@ -59,7 +59,16 @@ fun NavegacionApp(navController: NavHostController = rememberNavController()) {
             }
 
             composable(Rutas.MAPA) { MapaVista() }
-            composable(Rutas.PUBLICAR) { PublicarVista() }
+            composable(Rutas.PUBLICAR) {
+                PublicarVista(
+                    alTerminar = {
+                        navController.navigate(Rutas.HOME) {
+                            popUpTo(Rutas.HOME)
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
             composable(Rutas.PERFIL) { PerfilVista() }
 
             composable(

@@ -1,5 +1,6 @@
 package com.example.bookswap.data.local
 
+import com.example.bookswap.data.modelo.CategoriaLibro
 import com.example.bookswap.data.modelo.EstadoLibro
 import com.example.bookswap.data.modelo.Libro
 
@@ -7,7 +8,7 @@ fun LibroEntidad.aDominio(): Libro = Libro(
     id = id,
     titulo = titulo,
     autor = autor,
-    genero = genero,
+    genero = runCatching { CategoriaLibro.valueOf(genero) }.getOrDefault(CategoriaLibro.OTRO),
     estado = EstadoLibro.valueOf(estado),
     imagenResId = imagenResId,
     lat = lat,
@@ -23,7 +24,7 @@ fun Libro.aEntidad(): LibroEntidad = LibroEntidad(
     id = id,
     titulo = titulo,
     autor = autor,
-    genero = genero,
+    genero = genero.name,
     estado = estado.name,
     imagenResId = imagenResId,
     imagenUri = imagenUri,

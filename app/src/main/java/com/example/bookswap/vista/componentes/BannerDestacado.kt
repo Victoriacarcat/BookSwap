@@ -1,6 +1,5 @@
 package com.example.bookswap.vista.componentes
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -8,8 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bookswap.data.modelo.Libro
 import com.example.bookswap.ui.theme.Mostaza
@@ -35,7 +32,9 @@ fun BannerDestacado(libro: Libro, alTocar: () -> Unit) {
                 Text("Intercambio destacado", color = Mostaza, style = MaterialTheme.typography.labelLarge)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(libro.titulo, color = Papel, style = MaterialTheme.typography.titleMedium)
-                Text("A ${libro.distanciaTexto} de ti", color = Papel, style = MaterialTheme.typography.bodySmall)
+                if (libro.distanciaTexto.isNotBlank()) {
+                    Text("A ${libro.distanciaTexto} de ti", color = Papel, style = MaterialTheme.typography.bodySmall)
+                }
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
                     onClick = alTocar,
@@ -44,13 +43,11 @@ fun BannerDestacado(libro: Libro, alTocar: () -> Unit) {
                     Text("Ver detalle")
                 }
             }
-            Image(
-                painter = painterResource(id = libro.imagenResId),
-                contentDescription = libro.titulo,
+            PortadaLibro(
+                libro = libro,
                 modifier = Modifier
                     .width(110.dp)
-                    .fillMaxHeight(),
-                contentScale = ContentScale.Crop
+                    .fillMaxHeight()
             )
         }
     }

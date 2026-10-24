@@ -22,6 +22,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.bookswap.vista.componentes.PortadaLibro
+
 
 @Composable
 fun DetalleVista(
@@ -60,13 +62,11 @@ fun DetalleVista(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Image(
-            painter = painterResource(id = libroActual.imagenResId),
-            contentDescription = libroActual.titulo,
+        PortadaLibro(
+            libro = libroActual,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(280.dp),
-            contentScale = ContentScale.Crop
+                .height(280.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -76,7 +76,7 @@ fun DetalleVista(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(text = "Género: ${libroActual.genero}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Categoría: ${libroActual.genero.etiqueta}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Estado: ${libroActual.estado.name}", style = MaterialTheme.typography.bodyMedium)
 
         if (libroActual.descripcion.isNotBlank()) {
