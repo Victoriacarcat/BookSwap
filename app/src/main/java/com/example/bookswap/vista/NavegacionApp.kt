@@ -16,6 +16,7 @@ import com.example.bookswap.vista.componentes.BarraInferior
 import com.example.bookswap.vista.componentes.BarraSuperior
 import com.example.bookswap.vista.detalle.DetalleVista
 import com.example.bookswap.vista.home.HomeVista
+import com.example.bookswap.vista.intercambio.SolicitarIntercambioVista
 import com.example.bookswap.vista.mapa.MapaVista
 import com.example.bookswap.vista.perfil.PerfilVista
 import com.example.bookswap.vista.publicar.PublicarVista
@@ -58,7 +59,13 @@ fun NavegacionApp(navController: NavHostController = rememberNavController()) {
                 )
             }
 
-            composable(Rutas.MAPA) { MapaVista() }
+            composable(Rutas.MAPA) {
+                MapaVista(
+                    alTocarLibro = { libro ->
+                        navController.navigate(Rutas.detalleConId(libro.id))
+                    }
+                )
+            }
             composable(Rutas.PUBLICAR) {
                 PublicarVista(
                     alTerminar = {
@@ -69,7 +76,15 @@ fun NavegacionApp(navController: NavHostController = rememberNavController()) {
                     }
                 )
             }
-            composable(Rutas.PERFIL) { PerfilVista() }
+            composable(Rutas.PERFIL) {
+                PerfilVista(
+                    alEditarSolicitud = { solicitud ->
+                        navController.navigate(
+                            Rutas.solicitarConId(solicitud.idLibroSolicitado, solicitud.id)
+                        )
+                    }
+                )
+            }
 
             composable(
                 route = Rutas.DETALLE,
@@ -78,8 +93,50 @@ fun NavegacionApp(navController: NavHostController = rememberNavController()) {
                 val idLibro = backStackEntry.arguments?.getString("idLibro") ?: return@composable
                 DetalleVista(
                     idLibro = idLibro,
-                    alProponerIntercambio = { },
+                    alProponerIntercambio = {
+                        navController.navigate(Rutas.solicitarConId(idLibro))
+                    },
+                    alEditar = {
+                        navController.navigate(Rutas.editarLibroConId(idLibro))
+                    },
                     alVolver = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Rutas.EDITAR_LIBRO,
+                arguments = listOf(navArgument("idLibro") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val idLibro = backStackEntry.arguments?.getString("idLibro") ?: return@composable
+                PublicarVista(
+                    idLibro = idLibro,
+                    alTerminar = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Rutas.SOLICITAR,
+                arguments = listOf(
+                    navArgument("idLibro") { type = NavType.StringType },
+                    navArgument("idSolicitud") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
+                val idLibro = backStackEntry.arguments?.getString("idLibro") ?: return@composable
+                SolicitarIntercambioVista(
+                    idLibro = idLibro,
+                    idSolicitud = backStackEntry.arguments?.getString("idSolicitud"),
+                    alEnviar = { navController.popBackStack() },
+                    alVolver = { navController.popBackStack() },
+                    alPublicar = {
+                        navController.navigate(Rutas.PUBLICAR) {
+                            popUpTo(Rutas.HOME)
+                            launchSingleTop = true
+                        }
+                    }
                 )
             }
         }

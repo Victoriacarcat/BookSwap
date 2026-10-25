@@ -1,23 +1,31 @@
 // vista/mapa/MapaVistaModelo.kt
 package com.example.bookswap.vista.mapa
 
-import android.location.Location
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.bookswap.data.ubicacion.ProveedorUbicacion
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.bookswap.BookSwapApp
+import com.example.bookswap.data.modelo.Libro
+import com.example.bookswap.data.repo.LibroRepositorio
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
 
-class MapaVistaModelo : ViewModel() {
+class MapaVistaModelo(
+    repositorio: LibroRepositorio
+) : ViewModel() {
 
-    private val _ubicacion = MutableStateFlow<Location?>(null)
-    val ubicacion: StateFlow<Location?> = _ubicacion.asStateFlow()
+    val libros: StateFlow<List<Libro>> = repositorio.observarLibros()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun cargarUbicacion(proveedor: ProveedorUbicacion) {
-        viewModelScope.launch {
-            _ubicacion.value = proveedor.obtenerUbicacionActual()
+    companion object {
+        val Fabrica = viewModelFactory {
+            initializer {
+                val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookSwapApp
+                MapaVistaModelo(app.libroRepositorio)
+            }
         }
     }
 }

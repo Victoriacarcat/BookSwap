@@ -18,11 +18,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,9 +44,15 @@ import com.example.bookswap.data.modelo.CategoriaLibro
 @Composable
 fun PublicarVista(
     alTerminar: () -> Unit,
+    idLibro: String? = null,
     vistaModelo: PublicarVistaModelo = viewModel(factory = PublicarVistaModelo.Fabrica)
 ) {
     val contexto = LocalContext.current
+    val esEdicion = idLibro != null
+
+    LaunchedEffect(idLibro) {
+        if (idLibro != null) vistaModelo.cargarParaEditar(idLibro)
+    }
 
     val selectorFoto = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -62,6 +70,13 @@ fun PublicarVista(
         }
     }
 
+    if (esEdicion && !vistaModelo.editando) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +84,10 @@ fun PublicarVista(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Publicar un libro", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            if (esEdicion) "Editar publicación" else "Publicar un libro",
+            style = MaterialTheme.typography.headlineSmall
+        )
 
         Box(
             modifier = Modifier
@@ -156,7 +174,9 @@ fun PublicarVista(
 
         Button(
             onClick = {
-                if (tienePermisoUbicacion(contexto)) {
+                if (esEdicion) {
+                    vistaModelo.guardarCambios(alTerminar)
+                } else if (tienePermisoUbicacion(contexto)) {
                     vistaModelo.publicar(alTerminar)
                 } else {
                     lanzadorPermiso.launch(
@@ -170,7 +190,13 @@ fun PublicarVista(
             enabled = vistaModelo.puedePublicar,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(if (vistaModelo.guardando) "Guardando..." else "Publicar libro")
+            Text(
+                when {
+                    vistaModelo.guardando -> "Guardando..."
+                    esEdicion -> "Guardar cambios"
+                    else -> "Publicar libro"
+                }
+            )
         }
     }
 }

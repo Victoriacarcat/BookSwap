@@ -13,10 +13,12 @@ import com.example.bookswap.BookSwapApp
 import com.example.bookswap.data.imagenes.AlmacenImagenes
 import com.example.bookswap.data.modelo.CategoriaLibro
 import com.example.bookswap.data.modelo.EstadoLibro
+import com.example.bookswap.data.modelo.ID_USUARIO_ACTUAL
 import com.example.bookswap.data.modelo.Libro
 import com.example.bookswap.data.repo.LibroRepositorio
 import com.example.bookswap.data.ubicacion.ProveedorUbicacion
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.UUID
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -37,6 +39,11 @@ class PublicarVistaModelo(
     var guardando by mutableStateOf(false)
         private set
     var error by mutableStateOf<String?>(null)
+        private set
+
+    // Libro que se está editando; null cuando es una publicación nueva
+    private var libroOriginal: Libro? = null
+    var editando by mutableStateOf(false)
         private set
 
     val formularioValido: Boolean
@@ -98,6 +105,59 @@ class PublicarVistaModelo(
         }
     }
 
+    fun cargarParaEditar(id: String) {
+        if (libroOriginal?.id == id) return
+        viewModelScope.launch {
+            val libro = repositorio.obtenerLibroPorId(id) ?: return@launch
+            libroOriginal = libro
+            titulo = libro.titulo
+            autor = libro.autor
+            genero = libro.genero
+            estado = libro.estado
+            descripcion = libro.descripcion
+            notaPublicante = libro.notaPublicante
+            fotoUri = libro.imagenUri?.let { Uri.fromFile(File(it)) }
+            editando = true
+        }
+    }
+
+    fun guardarCambios(alTerminar: () -> Unit) {
+        val original = libroOriginal
+        val foto = fotoUri
+        val categoria = genero
+        if (!puedePublicar || original == null || foto == null || categoria == null) return
+
+        guardando = true
+        error = null
+
+        viewModelScope.launch {
+            // "file" = la portada que ya tenía; otra cosa = eligió una foto nueva en la galería
+            val rutaFoto = if (foto.scheme == "file") foto.path else almacenImagenes.guardar(foto)
+            if (rutaFoto == null) {
+                error = "No se pudo guardar la portada. Elige la foto de nuevo."
+                guardando = false
+                return@launch
+            }
+            if (rutaFoto != original.imagenUri) {
+                original.imagenUri?.let { File(it).delete() }
+            }
+
+            repositorio.actualizarLibro(
+                original.copy(
+                    titulo = titulo.trim(),
+                    autor = autor.trim(),
+                    genero = categoria,
+                    estado = estado,
+                    descripcion = descripcion.trim(),
+                    notaPublicante = notaPublicante.trim(),
+                    imagenUri = rutaFoto
+                )
+            )
+            guardando = false
+            alTerminar()
+        }
+    }
+
     private fun limpiar() {
         titulo = ""
         autor = ""
@@ -109,8 +169,6 @@ class PublicarVistaModelo(
     }
 
     companion object {
-        const val ID_USUARIO_ACTUAL = "yo"
-
         val Fabrica = viewModelFactory {
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookSwapApp

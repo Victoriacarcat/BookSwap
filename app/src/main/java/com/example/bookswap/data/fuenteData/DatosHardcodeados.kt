@@ -26,4 +26,7 @@ object DatosHardcodeados {
         Usuario("u2", "Andrés", "andres@email.com", listOf("2")),
         Usuario("u3", "Luis", "luis@email.com", listOf("3"))
     )
+
+    fun nombreUsuario(id: String): String =
+        usuarios.firstOrNull { it.id == id }?.nombre ?: "otro lector"
 }

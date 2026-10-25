@@ -23,7 +23,7 @@ fun GestorPermisoUbicacion(
     alDetener: () -> Unit
 ) {
     val contexto = LocalContext.current
-    val duenoCicloVida = LocalLifecycleOwner.current
+    val dueñoCicloVida = LocalLifecycleOwner.current
 
     val alConcedidoActual by rememberUpdatedState(alConcedido)
     val alDenegadoActual by rememberUpdatedState(alDenegado)
@@ -37,7 +37,7 @@ fun GestorPermisoUbicacion(
         if (resultados.values.any { it }) alConcedidoActual() else alDenegadoActual()
     }
 
-    DisposableEffect(duenoCicloVida) {
+    DisposableEffect(dueñoCicloVida) {
         val observador = LifecycleEventObserver { _, evento ->
             when (evento) {
                 Lifecycle.Event.ON_START -> {
@@ -59,7 +59,7 @@ fun GestorPermisoUbicacion(
                 else -> Unit
             }
         }
-        duenoCicloVida.lifecycle.addObserver(observador)
-        onDispose { duenoCicloVida.lifecycle.removeObserver(observador) }
+        dueñoCicloVida.lifecycle.addObserver(observador)
+        onDispose { dueñoCicloVida.lifecycle.removeObserver(observador) }
     }
 }

@@ -17,6 +17,14 @@ class LibroRepositorioRoom(
             entidades.map { it.aDominio() }
         }
 
+    override fun observarLibrosDe(idDueño: String): Flow<List<Libro>> =
+        libroDao.observarPorDueño(idDueño).map { entidades ->
+            entidades.map { it.aDominio() }
+        }
+
+    override fun observarLibro(id: String): Flow<Libro?> =
+        libroDao.observarPorId(id).map { it?.aDominio() }
+
     override suspend fun obtenerLibroPorId(id: String): Libro? =
         libroDao.buscarPorId(id)?.aDominio()
 
@@ -24,9 +32,28 @@ class LibroRepositorioRoom(
         libroDao.insertar(libro.aEntidad())
     }
 
-    suspend fun sembrarSiVacio() {
+    override suspend fun actualizarLibro(libro: Libro) {
+        libroDao.actualizar(
+            id = libro.id,
+            titulo = libro.titulo,
+            autor = libro.autor,
+            genero = libro.genero.name,
+            estado = libro.estado.name,
+            descripcion = libro.descripcion,
+            notaPublicante = libro.notaPublicante,
+            imagenUri = libro.imagenUri
+        )
+    }
+
+    suspend fun sembrarDatosIniciales() {
         if (libroDao.contar() == 0) {
             libroDao.insertarTodos(DatosHardcodeados.libros.map { it.aEntidad() })
+        } else {
+            // Los ids de R.drawable cambian al recompilar (p. ej. al agregar librerías),
+            // así que se refrescan en cada arranque para que las portadas no se desfasen
+            DatosHardcodeados.libros.forEach {
+                libroDao.actualizarImagenRecurso(it.id, it.imagenResId)
+            }
         }
     }
 }

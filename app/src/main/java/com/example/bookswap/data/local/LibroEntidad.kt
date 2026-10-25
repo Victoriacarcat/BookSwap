@@ -14,7 +14,7 @@ data class LibroEntidad(
     val imagenUri: String?,
     val lat: Double,
     val lng: Double,
-    val idDueno: String,
+    val idDueño: String,
     val disponible: Boolean,
     val descripcion: String,
     val notaPublicante: String,

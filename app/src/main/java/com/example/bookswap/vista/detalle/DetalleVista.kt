@@ -11,6 +11,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.bookswap.data.modelo.ID_USUARIO_ACTUAL
 import com.example.bookswap.vista.componentes.PortadaLibro
 
 
@@ -29,10 +31,12 @@ import com.example.bookswap.vista.componentes.PortadaLibro
 fun DetalleVista(
     idLibro: String,
     alProponerIntercambio: () -> Unit,
+    alEditar: () -> Unit = {},
     alVolver: () -> Unit = {},
     vistaModelo: DetalleVistaModelo = viewModel(factory = DetalleVistaModelo.Fabrica)
 ) {
     val libro by vistaModelo.libro.collectAsState()
+    val solicitudPendiente by vistaModelo.solicitudPendiente.collectAsState()
 
     LaunchedEffect(idLibro) {
         vistaModelo.cargarLibro(idLibro)
@@ -95,12 +99,28 @@ fun DetalleVista(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        val esMio = libroActual.idDueño == ID_USUARIO_ACTUAL
+        val yaSolicitado = solicitudPendiente != null
+
         Button(
             onClick = alProponerIntercambio,
             modifier = Modifier.fillMaxWidth(),
-            enabled = libroActual.disponible
+            enabled = libroActual.disponible && !esMio && !yaSolicitado
         ) {
-            Text(if (libroActual.disponible) "Proponer intercambio" else "No disponible")
+            Text(
+                when {
+                    esMio -> "Es tu libro"
+                    !libroActual.disponible -> "No disponible"
+                    yaSolicitado -> "Solicitud enviada"
+                    else -> "Proponer intercambio"
+                }
+            )
+        }
+
+        if (esMio) {
+            OutlinedButton(onClick = alEditar, modifier = Modifier.fillMaxWidth()) {
+                Text("Editar publicación")
+            }
         }
     }
 }

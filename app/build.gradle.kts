@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("com.google.android.gms:play-services-location:21.4.0")
     implementation(libs.coil.compose)
+    implementation(libs.osmdroid.android)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
