@@ -10,7 +10,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookswap.BookSwapApp
 import com.example.bookswap.data.modelo.EstadoSolicitud
-import com.example.bookswap.data.modelo.ID_USUARIO_ACTUAL
 import com.example.bookswap.data.modelo.Libro
 import com.example.bookswap.data.modelo.SolicitudIntercambio
 import com.example.bookswap.data.repo.LibroRepositorio
@@ -25,14 +24,15 @@ import java.util.UUID
 
 class SolicitarIntercambioVistaModelo(
     private val libroRepositorio: LibroRepositorio,
-    private val solicitudRepositorio: SolicitudRepositorio
+    private val solicitudRepositorio: SolicitudRepositorio,
+    private val idUsuario: String
 ) : ViewModel() {
 
     private val _libroSolicitado = MutableStateFlow<Libro?>(null)
     val libroSolicitado: StateFlow<Libro?> = _libroSolicitado.asStateFlow()
 
     // null mientras carga, para no mostrar "no tienes libros" antes de tiempo
-    val misLibros: StateFlow<List<Libro>?> = libroRepositorio.observarLibrosDe(ID_USUARIO_ACTUAL)
+    val misLibros: StateFlow<List<Libro>?> = libroRepositorio.observarLibrosDe(idUsuario)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     var libroOfrecido by mutableStateOf<Libro?>(null)
@@ -83,7 +83,7 @@ class SolicitarIntercambioVistaModelo(
                     id = UUID.randomUUID().toString(),
                     idLibroSolicitado = solicitado.id,
                     idLibroOfrecido = ofrecido.id,
-                    idSolicitante = ID_USUARIO_ACTUAL,
+                    idSolicitante = idUsuario,
                     idDueño = solicitado.idDueño,
                     mensaje = mensaje.trim(),
                     estado = EstadoSolicitud.PENDIENTE,
@@ -99,7 +99,11 @@ class SolicitarIntercambioVistaModelo(
         val Fabrica = viewModelFactory {
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookSwapApp
-                SolicitarIntercambioVistaModelo(app.libroRepositorio, app.solicitudRepositorio)
+                SolicitarIntercambioVistaModelo(
+                    app.libroRepositorio,
+                    app.solicitudRepositorio,
+                    app.autenticacion.idUsuarioActual()
+                )
             }
         }
     }

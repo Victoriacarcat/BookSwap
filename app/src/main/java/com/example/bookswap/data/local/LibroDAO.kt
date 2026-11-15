@@ -51,4 +51,7 @@ interface LibroDAO {
 
     @Query("UPDATE libros SET imagenResId = :imagenResId WHERE id = :id")
     suspend fun actualizarImagenRecurso(id: String, imagenResId: Int)
+
+    @Query("UPDATE libros SET idDueño = :idNuevo WHERE idDueño = :idAnterior")
+    suspend fun reasignarDueño(idAnterior: String, idNuevo: String)
 }

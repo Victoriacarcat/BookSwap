@@ -13,7 +13,6 @@ import com.example.bookswap.BookSwapApp
 import com.example.bookswap.data.imagenes.AlmacenImagenes
 import com.example.bookswap.data.modelo.CategoriaLibro
 import com.example.bookswap.data.modelo.EstadoLibro
-import com.example.bookswap.data.modelo.ID_USUARIO_ACTUAL
 import com.example.bookswap.data.modelo.Libro
 import com.example.bookswap.data.repo.LibroRepositorio
 import com.example.bookswap.data.ubicacion.ProveedorUbicacion
@@ -25,7 +24,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 class PublicarVistaModelo(
     private val repositorio: LibroRepositorio,
     private val almacenImagenes: AlmacenImagenes,
-    private val proveedorUbicacion: ProveedorUbicacion
+    private val proveedorUbicacion: ProveedorUbicacion,
+    private val idUsuario: String
 ) : ViewModel() {
 
     var titulo by mutableStateOf("")
@@ -93,7 +93,7 @@ class PublicarVistaModelo(
                 imagenResId = 0,
                 lat = ubicacion.latitude,
                 lng = ubicacion.longitude,
-                idDueño = ID_USUARIO_ACTUAL,
+                idDueño = idUsuario,
                 descripcion = descripcion.trim(),
                 notaPublicante = notaPublicante.trim(),
                 imagenUri = rutaFoto
@@ -175,7 +175,8 @@ class PublicarVistaModelo(
                 PublicarVistaModelo(
                     app.libroRepositorio,
                     AlmacenImagenes(app),
-                    ProveedorUbicacion(app)
+                    ProveedorUbicacion(app),
+                    app.autenticacion.idUsuarioActual()
                 )
             }
         }

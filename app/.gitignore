@@ -1,1 +1,3 @@
 /build
+# Configuración de Firebase propia de cada proyecto; descárgala de Firebase Console
+google-services.json

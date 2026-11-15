@@ -23,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.bookswap.data.modelo.ID_USUARIO_ACTUAL
 import com.example.bookswap.vista.componentes.PortadaLibro
 
 
@@ -99,7 +98,7 @@ fun DetalleVista(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        val esMio = libroActual.idDueño == ID_USUARIO_ACTUAL
+        val esMio = libroActual.idDueño == vistaModelo.idUsuario
         val yaSolicitado = solicitudPendiente != null
 
         Button(

@@ -38,4 +38,10 @@ interface SolicitudDAO {
 
     @Query("UPDATE solicitudes SET estado = :estado WHERE id = :id")
     suspend fun actualizarEstado(id: String, estado: String)
+
+    @Query("UPDATE solicitudes SET idSolicitante = :idNuevo WHERE idSolicitante = :idAnterior")
+    suspend fun reasignarSolicitante(idAnterior: String, idNuevo: String)
+
+    @Query("UPDATE solicitudes SET idDueño = :idNuevo WHERE idDueño = :idAnterior")
+    suspend fun reasignarDueño(idAnterior: String, idNuevo: String)
 }

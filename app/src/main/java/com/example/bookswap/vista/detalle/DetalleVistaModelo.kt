@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookswap.BookSwapApp
-import com.example.bookswap.data.modelo.ID_USUARIO_ACTUAL
 import com.example.bookswap.data.modelo.Libro
 import com.example.bookswap.data.modelo.SolicitudIntercambio
 import com.example.bookswap.data.repo.LibroRepositorio
@@ -21,7 +20,8 @@ import kotlinx.coroutines.flow.stateIn
 
 class DetalleVistaModelo(
     repositorio: LibroRepositorio,
-    solicitudRepositorio: SolicitudRepositorio
+    solicitudRepositorio: SolicitudRepositorio,
+    val idUsuario: String
 ) : ViewModel() {
 
     private val idLibro = MutableStateFlow<String?>(null)
@@ -36,7 +36,7 @@ class DetalleVistaModelo(
     @OptIn(ExperimentalCoroutinesApi::class)
     val solicitudPendiente: StateFlow<SolicitudIntercambio?> = idLibro
         .filterNotNull()
-        .flatMapLatest { solicitudRepositorio.observarPendiente(it, ID_USUARIO_ACTUAL) }
+        .flatMapLatest { solicitudRepositorio.observarPendiente(it, idUsuario) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     fun cargarLibro(id: String) {
@@ -47,7 +47,11 @@ class DetalleVistaModelo(
         val Fabrica = viewModelFactory {
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookSwapApp
-                DetalleVistaModelo(app.libroRepositorio, app.solicitudRepositorio)
+                DetalleVistaModelo(
+                    app.libroRepositorio,
+                    app.solicitudRepositorio,
+                    app.autenticacion.idUsuarioActual()
+                )
             }
         }
     }

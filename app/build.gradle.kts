@@ -4,6 +4,12 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// google-services.json se descarga de Firebase Console y no se versiona. Sin él la app compila,
+// pero el inicio de sesión con Google queda deshabilitado
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.example.bookswap"
     compileSdk {
@@ -54,6 +60,12 @@ dependencies {
     implementation(libs.osmdroid.android)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.kotlinx.coroutines.play.services)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

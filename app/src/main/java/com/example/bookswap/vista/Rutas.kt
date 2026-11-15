@@ -1,6 +1,7 @@
 package com.example.bookswap.vista
 
 object Rutas {
+    const val LOGIN = "login"
     const val HOME = "home"
     const val MAPA = "mapa"
     const val PUBLICAR = "publicar"
